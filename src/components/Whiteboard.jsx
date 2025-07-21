@@ -10,7 +10,7 @@ const Whiteboard = ({ user, roomCode, roomName, onLeaveRoom }) => {
   const [brushColor, setBrushColor] = useState('#000000')
   const [lastPos, setLastPos] = useState({ x: 0, y: 0 })
 
-  // FIXED: Complete SVG templates for cursor visibility
+  // FIXED: Complete SVG templates for custom cursor
   const createCustomCursor = () => {
     if (tool === 'pen') {
       const size = Math.max(brushSize + 4, 12);
@@ -40,8 +40,8 @@ const Whiteboard = ({ user, roomCode, roomName, onLeaveRoom }) => {
   };
 
   useEffect(() => {
-    // UPDATED: Use deployed backend URL for Socket.IO
-    socketRef.current = io('https://collaborative-whiteboard-three-inky.vercel.app')
+    // UPDATED: Use your new Render backend URL for Socket.IO
+    socketRef.current = io('https://collaborative-whiteboard-480h.onrender.com')
     socketRef.current.emit('join-room', roomCode)
     
     socketRef.current.on('canvas-data', ({ imageData }) => {

@@ -10,8 +10,8 @@ const LoginPage = ({ onLogin }) => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  // UPDATED: Use your deployed backend URL
-  const API_BASE_URL = 'https://collaborative-whiteboard-three-inky.vercel.app'
+  // UPDATED: Use your new Render backend URL
+  const API_BASE_URL = 'https://collaborative-whiteboard-480h.onrender.com'
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
