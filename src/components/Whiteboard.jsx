@@ -10,7 +10,6 @@ const Whiteboard = ({ user, roomCode, roomName, onLeaveRoom }) => {
   const [brushColor, setBrushColor] = useState('#000000')
   const [lastPos, setLastPos] = useState({ x: 0, y: 0 })
 
-G
   const createCustomCursor = () => {
     if (tool === 'pen') {
       const size = Math.max(brushSize + 4, 12);
@@ -40,8 +39,8 @@ G
   };
 
   useEffect(() => {
-    
-    socketRef.current = io('http://localhost:3000')
+    // UPDATED: Use deployed backend URL for Socket.IO
+    socketRef.current = io('https://collaborative-whiteboard-three-inky.vercel.app')
     socketRef.current.emit('join-room', roomCode)
     
     socketRef.current.on('canvas-data', ({ imageData }) => {
@@ -76,11 +75,8 @@ G
     const canvas = canvasRef.current
     if (!canvas) return
 
-    
-    canvas.width = 650 
-    canvas.height = 450 
-    
-
+    canvas.width = 650
+    canvas.height = 450
     canvas.style.width = '650px'
     canvas.style.height = '450px'
 
@@ -90,7 +86,6 @@ G
     ctx.fillStyle = 'white'
     ctx.fillRect(0, 0, canvas.width, canvas.height)
   }, [])
-
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -159,7 +154,6 @@ G
     })
   }
 
- 
   const handleTouchStart = (e) => {
     e.preventDefault()
     const touch = e.touches[0]

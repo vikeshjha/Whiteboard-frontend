@@ -7,13 +7,15 @@ const RoomManager = ({ user, onJoinRoom }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // UPDATED: Use your deployed backend URL
+  const API_BASE_URL = 'https://collaborative-whiteboard-three-inky.vercel.app';
+
   const handleJoinRoom = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
     try {
-    
       const token = localStorage.getItem('authToken');
       
       if (!token) {
@@ -24,7 +26,8 @@ const RoomManager = ({ user, onJoinRoom }) => {
 
       console.log('Attempting to join room:', roomCode.trim().toUpperCase());
 
-      const response = await fetch('http://localhost:3000/api/verify-room', {
+      // UPDATED: Use deployed backend URL
+      const response = await fetch(`${API_BASE_URL}/api/verify-room`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -81,7 +84,8 @@ const RoomManager = ({ user, onJoinRoom }) => {
 
       console.log('Creating room:', roomName.trim());
 
-      const response = await fetch('http://localhost:3000/api/create-room', {
+      // UPDATED: Use deployed backend URL
+      const response = await fetch(`${API_BASE_URL}/api/create-room`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

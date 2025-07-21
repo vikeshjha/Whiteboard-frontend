@@ -10,10 +10,12 @@ const LoginPage = ({ onLogin }) => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
+  // UPDATED: Use your deployed backend URL
+  const API_BASE_URL = 'https://collaborative-whiteboard-three-inky.vercel.app'
+
   const handleInputChange = (e) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
-    
     if (error) setError('')
   }
 
@@ -22,7 +24,6 @@ const LoginPage = ({ onLogin }) => {
     setLoading(true)
     setError('')
 
-  
     if (!formData.username || !formData.password) {
       setError('Please fill in all fields')
       setLoading(false)
@@ -30,7 +31,8 @@ const LoginPage = ({ onLogin }) => {
     }
 
     try {
-      const response = await fetch('http://localhost:3000/api/login', {
+      // UPDATED: Use deployed backend URL
+      const response = await fetch(`${API_BASE_URL}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -42,7 +44,6 @@ const LoginPage = ({ onLogin }) => {
       const data = await response.json()
       
       if (response.ok) {
-       
         localStorage.setItem('authToken', data.token)
         localStorage.setItem('user', JSON.stringify(data.user))
         onLogin(data.user)
@@ -61,7 +62,6 @@ const LoginPage = ({ onLogin }) => {
     setLoading(true)
     setError('')
 
-   
     if (!formData.username || !formData.email || !formData.password) {
       setError('Please fill in all fields')
       setLoading(false)
@@ -87,7 +87,8 @@ const LoginPage = ({ onLogin }) => {
     }
 
     try {
-      const response = await fetch('http://localhost:3000/api/register', {
+      // UPDATED: Use deployed backend URL
+      const response = await fetch(`${API_BASE_URL}/api/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -117,13 +118,10 @@ const LoginPage = ({ onLogin }) => {
   return (
     <div className="login-container">
       <h1>🎨 Collaborative Whiteboard</h1>
-      
-      {error && <div className="error-message">{error}</div>}
-      
       <div className="form-container">
         <div className="tab-buttons">
-          <button 
-            className={`tab-btn ${activeTab === 'login' ? 'active' : ''}`}
+          <button
+            className={activeTab === 'login' ? 'tab-btn active' : 'tab-btn'}
             onClick={() => {
               setActiveTab('login')
               setError('')
@@ -132,8 +130,8 @@ const LoginPage = ({ onLogin }) => {
           >
             Login
           </button>
-          <button 
-            className={`tab-btn ${activeTab === 'register' ? 'active' : ''}`}
+          <button
+            className={activeTab === 'register' ? 'tab-btn active' : 'tab-btn'}
             onClick={() => {
               setActiveTab('register')
               setError('')
@@ -144,8 +142,10 @@ const LoginPage = ({ onLogin }) => {
           </button>
         </div>
 
+        {error && <div className="error-message">{error}</div>}
+
         {activeTab === 'login' ? (
-          <form className="form" onSubmit={handleLogin}>
+          <form onSubmit={handleLogin} className="form">
             <h2>Welcome Back!</h2>
             <input
               type="text"
@@ -170,7 +170,7 @@ const LoginPage = ({ onLogin }) => {
             </button>
           </form>
         ) : (
-          <form className="form" onSubmit={handleRegister}>
+          <form onSubmit={handleRegister} className="form">
             <h2>Create Account</h2>
             <input
               type="text"
@@ -181,15 +181,17 @@ const LoginPage = ({ onLogin }) => {
               disabled={loading}
               required
             />
-            <input
-              type="email"
-              name="email"
-              placeholder="Email (must be @gmail.com)"
-              value={formData.email}
-              onChange={handleInputChange}
-              disabled={loading}
-              required
-            />
+            <div className="email-input-wrapper">
+              <input
+                type="email"
+                name="email"
+                placeholder="Email (xyz@gmail.com)"
+                value={formData.email}
+                onChange={handleInputChange}
+                disabled={loading}
+                required
+              />
+            </div>
             <input
               type="password"
               name="password"
@@ -200,7 +202,7 @@ const LoginPage = ({ onLogin }) => {
               required
             />
             <button type="submit" disabled={loading}>
-              {loading ? 'Registering...' : 'Register'}
+              {loading ? 'Creating Account...' : 'Register'}
             </button>
           </form>
         )}
