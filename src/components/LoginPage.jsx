@@ -31,28 +31,34 @@ const LoginPage = ({ onLogin }) => {
     }
 
     try {
-      // UPDATED: Use deployed backend URL
+      console.log('Attempting login with:', { username: formData.username });
+      
       const response = await fetch(`${API_BASE_URL}/api/login`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
         body: JSON.stringify({
           username: formData.username,
           password: formData.password
         }),
       })
 
+      console.log('Login response status:', response.status);
       const data = await response.json()
+      console.log('Login response data:', data);
       
       if (response.ok) {
         localStorage.setItem('authToken', data.token)
         localStorage.setItem('user', JSON.stringify(data.user))
         onLogin(data.user)
       } else {
-        setError(data.error || 'Login failed')
+        setError(data.error || `Login failed: ${response.status}`)
       }
     } catch (err) {
       console.error('Login error:', err)
-      setError('Network error. Please check your connection.')
+      setError(`Network error: ${err.message}`)
     }
     setLoading(false)
   }
@@ -87,10 +93,17 @@ const LoginPage = ({ onLogin }) => {
     }
 
     try {
-      // UPDATED: Use deployed backend URL
+      console.log('Attempting registration with:', { 
+        username: formData.username, 
+        email: formData.email 
+      });
+      
       const response = await fetch(`${API_BASE_URL}/api/register`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
         body: JSON.stringify({
           username: formData.username,
           email: formData.email,
@@ -98,7 +111,9 @@ const LoginPage = ({ onLogin }) => {
         }),
       })
 
+      console.log('Register response status:', response.status);
       const data = await response.json()
+      console.log('Register response data:', data);
       
       if (response.ok) {
         setActiveTab('login')
@@ -106,11 +121,11 @@ const LoginPage = ({ onLogin }) => {
         setError('')
         alert('Registration successful! Please login with your credentials.')
       } else {
-        setError(data.error || 'Registration failed')
+        setError(data.error || `Registration failed: ${response.status}`)
       }
     } catch (err) {
       console.error('Registration error:', err)
-      setError('Network error. Please check your connection.')
+      setError(`Network error: ${err.message}`)
     }
     setLoading(false)
   }

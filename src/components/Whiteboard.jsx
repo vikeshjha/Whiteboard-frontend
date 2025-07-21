@@ -10,6 +10,7 @@ const Whiteboard = ({ user, roomCode, roomName, onLeaveRoom }) => {
   const [brushColor, setBrushColor] = useState('#000000')
   const [lastPos, setLastPos] = useState({ x: 0, y: 0 })
 
+  // FIXED: Complete SVG templates for cursor visibility
   const createCustomCursor = () => {
     if (tool === 'pen') {
       const size = Math.max(brushSize + 4, 12);
