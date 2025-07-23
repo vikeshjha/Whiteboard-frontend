@@ -1,21 +1,25 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 
+/* Global Reset and Fullscreen Setup */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+
 html, body {
   height: 100%;
-  overflow: hidden; 
+  overflow: hidden; /* Prevents page scrolling */
 }
+
 
 #root {
   height: 100vh;
   width: 100vw;
 }
+
 
 .App {
   height: 100vh;
@@ -36,11 +40,13 @@ html, body {
 }
 
 
+/* Animated Background */
 @keyframes gradientShift {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
+
 
 .App::before {
   content: '';
@@ -55,12 +61,14 @@ html, body {
   z-index: -1;
 }
 
+
 @keyframes float {
   0% { transform: translateY(0px) rotate(0deg); }
   100% { transform: translateY(-100vh) rotate(360deg); }
 }
 
 
+/* Login Page - Centered with Enhanced Design */
 .login-container {
   max-width: 450px;
   width: 90%;
@@ -75,6 +83,7 @@ html, body {
   position: relative;
 }
 
+
 @keyframes slideUp {
   from {
     opacity: 0;
@@ -85,6 +94,7 @@ html, body {
     transform: translateY(0);
   }
 }
+
 
 .login-container::before {
   content: '';
@@ -98,10 +108,12 @@ html, body {
   animation: shimmer 3s linear infinite;
 }
 
+
 @keyframes shimmer {
   0% { transform: rotate(45deg) translateX(-200%); }
   100% { transform: rotate(45deg) translateX(200%); }
 }
+
 
 .login-container h1 {
   background: linear-gradient(45deg, #667eea, #764ba2);
@@ -115,6 +127,7 @@ html, body {
   z-index: 1;
 }
 
+
 .form-container {
   padding: 35px;
   position: relative;
@@ -122,6 +135,7 @@ html, body {
 }
 
 
+/* Room Manager - Enhanced Design */
 .room-manager {
   max-width: 500px;
   width: 90%;
@@ -134,6 +148,7 @@ html, body {
   padding: 35px;
   animation: slideUp 0.6s ease-out;
 }
+
 
 .room-manager h2 {
   color: #333;
@@ -148,6 +163,7 @@ html, body {
 }
 
 
+/* Whiteboard App - Fullscreen */
 .whiteboard-app {
   height: 100vh;
   width: 100vw;
@@ -158,12 +174,14 @@ html, body {
   animation: fadeIn 0.8s ease-out;
 }
 
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
 
+/* Room Header - Enhanced with Animation and Button Container */
 .room-header {
   background: linear-gradient(45deg, #667eea, #764ba2);
   color: white;
@@ -177,6 +195,7 @@ html, body {
   animation: slideDown 0.6s ease-out;
 }
 
+
 @keyframes slideDown {
   from {
     opacity: 0;
@@ -187,6 +206,7 @@ html, body {
     transform: translateY(0);
   }
 }
+
 
 .room-header::before {
   content: '';
@@ -200,10 +220,12 @@ html, body {
   animation: borderGlow 2s linear infinite;
 }
 
+
 @keyframes borderGlow {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
+
 
 .room-info h2 {
   margin: 0 0 8px 0;
@@ -211,12 +233,14 @@ html, body {
   font-weight: 700;
 }
 
+
 .room-info p {
   margin: 3px 0;
   opacity: 0.9;
   font-size: 14px;
   font-weight: 400;
 }
+
 
 .room-info strong {
   background: rgba(255, 255, 255, 0.25);
@@ -227,6 +251,7 @@ html, body {
 }
 
 
+/* Enhanced Header Buttons Container */
 .header-buttons {
   display: flex;
   align-items: center;
@@ -234,6 +259,7 @@ html, body {
 }
 
 
+/* Enhanced Back Button */
 .back-btn {
   background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
@@ -250,11 +276,13 @@ html, body {
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
+
 .back-btn:hover {
   background: linear-gradient(135deg, #5a67d8, #6b46c1);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
+
 
 .back-btn:active {
   transform: translateY(0);
@@ -262,6 +290,7 @@ html, body {
 }
 
 
+/* Enhanced Logout Button */
 .logout-btn {
   background: rgba(255, 255, 255, 0.2);
   color: white;
@@ -274,17 +303,20 @@ html, body {
   font-size: 14px;
 }
 
+
 .logout-btn:hover {
   background: rgba(255, 255, 255, 0.3);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
+
 .logout-btn:active {
   transform: translateY(0);
 }
 
 
+/* Tools Section - Enhanced Design */
 .tools {
   background: #f8f9fa;
   padding: 15px 30px;
@@ -298,6 +330,7 @@ html, body {
   animation: fadeInUp 0.8s ease-out 0.2s both;
 }
 
+
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -308,6 +341,7 @@ html, body {
     transform: translateY(0);
   }
 }
+
 
 .tool-group {
   display: flex;
@@ -320,11 +354,13 @@ html, body {
   border: 1px solid rgba(102, 126, 234, 0.1);
 }
 
+
 .tool-group:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
   border-color: rgba(102, 126, 234, 0.2);
 }
+
 
 .tool-group span {
   font-weight: 600;
@@ -332,6 +368,7 @@ html, body {
   font-size: 14px;
   min-width: 50px;
 }
+
 
 .tool-btn {
   padding: 10px 16px;
@@ -347,6 +384,7 @@ html, body {
   overflow: hidden;
 }
 
+
 .tool-btn::before {
   content: '';
   position: absolute;
@@ -358,9 +396,11 @@ html, body {
   transition: left 0.5s;
 }
 
+
 .tool-btn:hover::before {
   left: 100%;
 }
+
 
 .tool-btn:hover {
   border-color: #667eea;
@@ -368,6 +408,7 @@ html, body {
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
 }
+
 
 .tool-btn.active {
   background: #667eea;
@@ -377,11 +418,13 @@ html, body {
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
+
 .tool-btn.danger {
   background: #dc3545;
   border-color: #dc3545;
   color: white;
 }
+
 
 .tool-btn.danger:hover {
   background: #c82333;
@@ -390,6 +433,7 @@ html, body {
 }
 
 
+/* Enhanced Tool Inputs */
 .tool-group input[type="color"] {
   width: 45px;
   height: 36px;
@@ -400,15 +444,18 @@ html, body {
   transition: all 0.2s ease;
 }
 
+
 .tool-group input[type="color"]:hover {
   transform: scale(1.1);
   border-color: #667eea;
 }
 
+
 .tool-group input[type="color"]:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
 
 .tool-group input[type="range"] {
   width: 120px;
@@ -420,6 +467,7 @@ html, body {
   -webkit-appearance: none;
   appearance: none;
 }
+
 
 .tool-group input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
@@ -434,12 +482,14 @@ html, body {
   transition: all 0.2s ease;
 }
 
+
 .tool-group input[type="range"]::-webkit-slider-thumb:hover {
   transform: scale(1.2);
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
 
+/* Canvas Container - Enhanced */
 .canvas-container {
   flex: 1;
   display: flex;
@@ -451,6 +501,7 @@ html, body {
 }
 
 
+/* Canvas - FIXED with exact dimensions for proper cursor positioning */
 .whiteboard-canvas {
   background: white;
   border: 3px solid #667eea;
@@ -459,11 +510,11 @@ html, body {
   transition: all 0.3s ease;
   animation: canvasEntrance 1s ease-out 0.4s both;
   
- 
+  /* CRITICAL: Fixed dimensions for cursor accuracy */
   width: 650px !important;
   height: 450px !important;
   
- 
+  /* Prevent any scaling or transforms */
   transform: none !important;
   image-rendering: pixelated;
   image-rendering: -moz-crisp-edges;
@@ -471,6 +522,7 @@ html, body {
   touch-action: none;
   user-select: none;
 }
+
 
 @keyframes canvasEntrance {
   from {
@@ -483,11 +535,13 @@ html, body {
   }
 }
 
+
 .whiteboard-canvas:hover {
   box-shadow: 0 12px 35px rgba(0, 0, 0, 0.18);
 }
 
 
+/* Enhanced Tab Buttons */
 .tab-buttons {
   display: flex;
   margin-bottom: 25px;
@@ -496,6 +550,7 @@ html, body {
   border: 1px solid #e1e5e9;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
+
 
 .tab-btn {
   flex: 1;
@@ -511,6 +566,7 @@ html, body {
   overflow: hidden;
 }
 
+
 .tab-btn::before {
   content: '';
   position: absolute;
@@ -522,14 +578,17 @@ html, body {
   transition: left 0.5s;
 }
 
+
 .tab-btn:hover::before {
   left: 100%;
 }
+
 
 .tab-btn:hover {
   background: #e9ecef;
   color: #495057;
 }
+
 
 .tab-btn.active {
   background: #667eea;
@@ -538,11 +597,13 @@ html, body {
 }
 
 
+/* Enhanced Forms */
 .form {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
+
 
 .form h2, .form h3 {
   color: #333;
@@ -551,15 +612,18 @@ html, body {
   text-align: center;
 }
 
+
 .form h2 {
   font-size: 24px;
 }
+
 
 .form h3 {
   font-size: 20px;
 }
 
 
+/* Enhanced Input Fields with Explicit Text Color */
 .form input[type="text"],
 .form input[type="password"],
 .form input[type="email"] {
@@ -577,6 +641,7 @@ html, body {
   caret-color: #667eea;
 }
 
+
 .form input[type="text"]:focus,
 .form input[type="password"]:focus,
 .form input[type="email"]:focus {
@@ -592,6 +657,7 @@ html, body {
 }
 
 
+/* Enhanced Email Input Styling with Visible Placeholder */
 .form input[type="email"]::placeholder {
   color: #9ca3af !important;
   font-style: italic;
@@ -600,6 +666,7 @@ html, body {
   transition: all 0.3s ease;
 }
 
+
 .form input[type="text"]::placeholder,
 .form input[type="password"]::placeholder {
   color: #9ca3af !important;
@@ -607,17 +674,20 @@ html, body {
   font-weight: 300;
 }
 
+
 .form input[type="email"]:focus::placeholder {
   color: #667eea !important;
   opacity: 0.6;
   transform: translateX(4px);
 }
 
+
 .form input[type="email"]:valid {
   border-color: #10b981;
   background: rgba(16, 185, 129, 0.02);
   color: #2d3748 !important;
 }
+
 
 .form input[type="email"]:invalid:not(:placeholder-shown) {
   border-color: #ef4444;
@@ -626,6 +696,7 @@ html, body {
 }
 
 
+/* Auto-fill styling to prevent invisible text */
 .form input:-webkit-autofill,
 .form input:-webkit-autofill:hover,
 .form input:-webkit-autofill:focus,
@@ -636,11 +707,13 @@ html, body {
 }
 
 
+/* Email Input Wrapper with Icon */
 .email-input-wrapper {
   position: relative;
   display: flex;
   align-items: center;
 }
+
 
 .email-input-wrapper::before {
   content: "📧";
@@ -653,11 +726,13 @@ html, body {
   pointer-events: none;
 }
 
+
 .email-input-wrapper input {
   padding-left: 48px;
   color: #2d3748 !important;
   -webkit-text-fill-color: #2d3748 !important;
 }
+
 
 .email-input-wrapper:focus-within::before {
   opacity: 1;
@@ -665,6 +740,7 @@ html, body {
 }
 
 
+/* Enhanced Submit Buttons */
 .form button[type="submit"] {
   padding: 16px 24px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -680,6 +756,7 @@ html, body {
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
 }
 
+
 .form button[type="submit"]::before {
   content: '';
   position: absolute;
@@ -691,18 +768,22 @@ html, body {
   transition: left 0.5s;
 }
 
+
 .form button[type="submit"]:hover::before {
   left: 100%;
 }
+
 
 .form button[type="submit"]:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
 }
 
+
 .form button[type="submit"]:active {
   transform: translateY(0);
 }
+
 
 .form button[type="submit"]:disabled {
   opacity: 0.6;
@@ -712,6 +793,7 @@ html, body {
 }
 
 
+/* Enhanced Error Messages */
 .error-message {
   background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
   color: white;
@@ -726,6 +808,7 @@ html, body {
   overflow: hidden;
 }
 
+
 @keyframes messageSlide {
   from {
     opacity: 0;
@@ -736,6 +819,7 @@ html, body {
     transform: translateX(0);
   }
 }
+
 
 .error-message::before {
   content: '';
@@ -748,12 +832,14 @@ html, body {
   animation: messageShimmer 2s infinite;
 }
 
+
 @keyframes messageShimmer {
   0% { left: -100%; }
   100% { left: 100%; }
 }
 
 
+/* Success Messages */
 .success-message {
   background: linear-gradient(135deg, #51cf66, #69db7c);
   color: white;
@@ -768,6 +854,7 @@ html, body {
   overflow: hidden;
 }
 
+
 .success-message::before {
   content: '';
   position: absolute;
@@ -780,10 +867,12 @@ html, body {
 }
 
 
+/* Enhanced Mobile Responsiveness */
 @media (max-width: 768px) {
   .App {
     padding: 10px;
   }
+
 
   .login-container,
   .room-manager {
@@ -791,9 +880,11 @@ html, body {
     margin: 0 auto;
   }
 
+
   .form-container {
     padding: 25px 20px;
   }
+
 
   .room-header {
     flex-direction: column;
@@ -803,12 +894,14 @@ html, body {
     min-height: auto;
   }
 
+
   .header-buttons {
     flex-direction: row;
     gap: 8px;
     justify-content: center;
     width: 100%;
   }
+
 
   .back-btn,
   .logout-btn {
@@ -817,9 +910,11 @@ html, body {
     justify-content: center;
   }
 
+
   .room-info h2 {
     font-size: 18px;
   }
+
 
   .tools {
     flex-direction: column;
@@ -829,14 +924,17 @@ html, body {
     min-height: auto;
   }
 
+
   .tool-group {
     justify-content: space-between;
     padding: 12px 16px;
   }
 
+
   .canvas-container {
     padding: 15px;
   }
+
 
   .whiteboard-canvas {
     width: 100% !important;
@@ -846,9 +944,11 @@ html, body {
     border-width: 2px;
   }
 
+
   .tab-buttons {
     margin-bottom: 20px;
   }
+
 
   .tab-btn {
     padding: 12px 18px;
@@ -856,14 +956,16 @@ html, body {
   }
 
 
+  /* Ensure text visibility on mobile */
   .form input[type="text"],
   .form input[type="password"],
   .form input[type="email"] {
     color: #2d3748 !important;
     -webkit-text-fill-color: #2d3748 !important;
-    font-size: 16px !important; 
+    font-size: 16px !important; /* Prevents zoom on iOS */
   }
 }
+
 
 @media (max-width: 480px) {
   .login-container h1 {
@@ -871,19 +973,23 @@ html, body {
     padding: 20px;
   }
 
+
   .room-manager h2 {
     font-size: 26px;
   }
 
+
   .form h2 {
     font-size: 20px;
   }
+
 
   .header-buttons {
     flex-direction: column;
     gap: 8px;
     width: 100%;
   }
+
 
   .back-btn,
   .logout-btn {
@@ -892,11 +998,13 @@ html, body {
     font-size: 13px;
   }
 
+
   .whiteboard-canvas {
     width: 100% !important;
     max-width: 300px !important;
     height: 240px !important;
   }
+
 
   .form input[type="text"],
   .form input[type="password"],
@@ -907,12 +1015,14 @@ html, body {
     -webkit-text-fill-color: #2d3748 !important;
   }
 
+
   .form button[type="submit"] {
     padding: 14px 20px;
   }
 }
 
 
+/* Enhanced Focus Styles for Accessibility */
 .tool-btn:focus,
 .logout-btn:focus,
 .back-btn:focus,
@@ -924,6 +1034,7 @@ html, body {
 }
 
 
+/* Loading States */
 .loading {
   background-image: linear-gradient(
     90deg,
@@ -932,36 +1043,42 @@ html, body {
     rgba(102, 126, 234, 0.1) 100%
   );
   background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
+  animation: loadingShimmer 1.5s infinite;
   color: #2d3748 !important;
   -webkit-text-fill-color: #2d3748 !important;
 }
 
-@keyframes shimmer {
+
+@keyframes loadingShimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
 
 
+/* Smooth Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
+
 
 ::-webkit-scrollbar-track {
   background: rgba(255,255,255,0.1);
   border-radius: 4px;
 }
 
+
 ::-webkit-scrollbar-thumb {
   background: linear-gradient(135deg, #667eea, #764ba2);
   border-radius: 4px;
 }
+
 
 ::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(135deg, #5a67d8, #6b46c1);
 }
 
 
+/* Global Input Text Visibility Fix */
 input[type="text"],
 input[type="password"],
 input[type="email"],
@@ -970,10 +1087,33 @@ textarea {
   -webkit-text-fill-color: #2d3748 !important;
 }
 
+
 input[type="text"]:focus,
 input[type="password"]:focus,
 input[type="email"]:focus,
 textarea:focus {
   color: #2d3748 !important;
   -webkit-text-fill-color: #2d3748 !important;
+}
+
+/* Original shimmer animation used by login container */
+@keyframes shimmer {
+  0% { transform: rotate(45deg) translateX(-200%); }
+  100% { transform: rotate(45deg) translateX(200%); }
+}
+
+/* Tool button hover shimmer animation */
+.tool-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.tool-btn:hover::before {
+  left: 100%;
 }

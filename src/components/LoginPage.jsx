@@ -10,7 +10,6 @@ const LoginPage = ({ onLogin }) => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  // UPDATED: Use your new Render backend URL
   const API_BASE_URL = 'https://collaborative-whiteboard-480h.onrender.com'
 
   const handleInputChange = (e) => {
@@ -24,14 +23,14 @@ const LoginPage = ({ onLogin }) => {
     setLoading(true)
     setError('')
 
-    if (!formData.username || !formData.password) {
+    if (!formData.username.trim() || !formData.password.trim()) {
       setError('Please fill in all fields')
       setLoading(false)
       return
     }
 
     try {
-      console.log('Attempting login with:', { username: formData.username });
+      console.log('Attempting login with:', { username: formData.username })
       
       const response = await fetch(`${API_BASE_URL}/api/login`, {
         method: 'POST',
@@ -40,25 +39,34 @@ const LoginPage = ({ onLogin }) => {
           'Accept': 'application/json'
         },
         body: JSON.stringify({
-          username: formData.username,
+          username: formData.username.trim(),
           password: formData.password
         }),
       })
 
-      console.log('Login response status:', response.status);
-      const data = await response.json()
-      console.log('Login response data:', data);
+      console.log('Login response status:', response.status)
       
-      if (response.ok) {
-        localStorage.setItem('authToken', data.token)
-        localStorage.setItem('user', JSON.stringify(data.user))
-        onLogin(data.user)
-      } else {
-        setError(data.error || `Login failed: ${response.status}`)
+      if (!response.ok) {
+        const errorText = await response.text()
+        let errorData
+        try {
+          errorData = JSON.parse(errorText)
+        } catch {
+          throw new Error(`Server error: ${response.status}`)
+        }
+        throw new Error(errorData.error || `Login failed: ${response.status}`)
       }
+
+      const data = await response.json()
+      console.log('Login response data:', data)
+      
+      localStorage.setItem('authToken', data.token)
+      localStorage.setItem('user', JSON.stringify(data.user))
+      onLogin(data.user)
+      
     } catch (err) {
       console.error('Login error:', err)
-      setError(`Network error: ${err.message}`)
+      setError(err.message)
     }
     setLoading(false)
   }
@@ -68,13 +76,13 @@ const LoginPage = ({ onLogin }) => {
     setLoading(true)
     setError('')
 
-    if (!formData.username || !formData.email || !formData.password) {
+    if (!formData.username.trim() || !formData.email.trim() || !formData.password.trim()) {
       setError('Please fill in all fields')
       setLoading(false)
       return
     }
 
-    if (formData.username.length < 3) {
+    if (formData.username.trim().length < 3) {
       setError('Username must be at least 3 characters')
       setLoading(false)
       return
@@ -94,9 +102,9 @@ const LoginPage = ({ onLogin }) => {
 
     try {
       console.log('Attempting registration with:', { 
-        username: formData.username, 
-        email: formData.email 
-      });
+        username: formData.username.trim(), 
+        email: formData.email.trim() 
+      })
       
       const response = await fetch(`${API_BASE_URL}/api/register`, {
         method: 'POST',
@@ -105,27 +113,36 @@ const LoginPage = ({ onLogin }) => {
           'Accept': 'application/json'
         },
         body: JSON.stringify({
-          username: formData.username,
-          email: formData.email,
+          username: formData.username.trim(),
+          email: formData.email.trim(),
           password: formData.password
         }),
       })
 
-      console.log('Register response status:', response.status);
-      const data = await response.json()
-      console.log('Register response data:', data);
+      console.log('Register response status:', response.status)
       
-      if (response.ok) {
-        setActiveTab('login')
-        setFormData({ username: '', email: '', password: '' })
-        setError('')
-        alert('Registration successful! Please login with your credentials.')
-      } else {
-        setError(data.error || `Registration failed: ${response.status}`)
+      if (!response.ok) {
+        const errorText = await response.text()
+        let errorData
+        try {
+          errorData = JSON.parse(errorText)
+        } catch {
+          throw new Error(`Server error: ${response.status}`)
+        }
+        throw new Error(errorData.error || `Registration failed: ${response.status}`)
       }
+
+      const data = await response.json()
+      console.log('Register response data:', data)
+      
+      setActiveTab('login')
+      setFormData({ username: '', email: '', password: '' })
+      setError('')
+      alert('Registration successful! Please login with your credentials.')
+      
     } catch (err) {
       console.error('Registration error:', err)
-      setError(`Network error: ${err.message}`)
+      setError(err.message)
     }
     setLoading(false)
   }

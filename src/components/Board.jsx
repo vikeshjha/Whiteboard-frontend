@@ -1,177 +1,237 @@
-import React, { useRef, useEffect, useState } from 'react';
-import io from 'socket.io-client';
+import React, { useRef, useEffect, useState } from 'react'
+import io from 'socket.io-client'
 
-const Board = ({ user, roomCode, roomName, onLeaveRoom }) => {
-  const canvasRef = useRef(null);
-  const socketRef = useRef(null);
-  const [isDrawing, setIsDrawing] = useState(false);
-  const [tool, setTool] = useState('pen');
-  const [brushSize, setBrushSize] = useState(5);
-  const [brushColor, setBrushColor] = useState('#000000');
+const Whiteboard = ({ user, roomCode, roomName, onLeaveRoom }) => {
+  const canvasRef = useRef(null)
+  const socketRef = useRef(null)
+  const [isDrawing, setIsDrawing] = useState(false)
+  const [tool, setTool] = useState('pen')
+  const [brushSize, setBrushSize] = useState(5)
+  const [brushColor, setBrushColor] = useState('#000000')
 
+  // Initialize socket and listeners
   useEffect(() => {
-  
-    socketRef.current = io('http://localhost:3000');
-    
-  
-    socketRef.current.emit('join-room', roomCode);
-    
+    socketRef.current = io('http://localhost:3000')
+
+    socketRef.current.emit('join-room', roomCode)
 
     socketRef.current.on('canvas-data', ({ imageData }) => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      
-      const ctx = canvas.getContext('2d');
-      const img = new Image();
-      img.onload = () => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, 0, 0);
-      };
-      img.src = imageData;
-    });
+      const canvas = canvasRef.current
+      if (!canvas) return
 
- 
+      const ctx = canvas.getContext('2d')
+      const img = new Image()
+      img.onload = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+      }
+      img.src = imageData
+    })
+
     socketRef.current.on('clear-canvas', () => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = 'white';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-    });
+      const canvas = canvasRef.current
+      if (!canvas) return
+
+      const ctx = canvas.getContext('2d')
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      ctx.fillStyle = 'white'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+    })
 
     return () => {
-      socketRef.current?.disconnect();
-    };
-  }, [roomCode]);
+      socketRef.current.disconnect()
+    }
+  }, [roomCode])
 
+  // Canvas sizing and initial white fill
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    const canvas = canvasRef.current
+    if (!canvas) return
 
- 
-    const setCanvasSize = () => {
-      const container = canvas.parentElement;
-      const containerRect = container.getBoundingClientRect();
-      
-  
-      const targetWidth = Math.min(containerRect.width - 40, 1000);
-      const targetHeight = Math.min(containerRect.height - 40, 600);
-      
- 
-      canvas.width = targetWidth;
-      canvas.height = targetHeight;
-      canvas.style.width = targetWidth + 'px';
-      canvas.style.height = targetHeight + 'px';
-      
-     
-      const ctx = canvas.getContext('2d');
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.fillStyle = 'white';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-    };
+    const resizeCanvas = () => {
+      const container = canvas.parentElement
+      if (!container) return
+      const containerRect = container.getBoundingClientRect()
 
-    setCanvasSize();
-    window.addEventListener('resize', setCanvasSize);
-    
-    return () => window.removeEventListener('resize', setCanvasSize);
-  }, []);
+      const maxWidth = Math.min(containerRect.width - 40, 1000)
+      const maxHeight = Math.min(containerRect.height - 40, 600)
 
-  const getMousePos = (e) => {
-    const canvas = canvasRef.current;
-    const rect = canvas.getBoundingClientRect();
-    
-    
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    
+      canvas.style.width = `${maxWidth}px`
+      canvas.style.height = `${maxHeight}px`
+      canvas.width = maxWidth
+      canvas.height = maxHeight
+
+      const ctx = canvas.getContext('2d')
+      ctx.lineCap = 'round'
+      ctx.lineJoin = 'round'
+      ctx.fillStyle = 'white'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+    }
+
+    resizeCanvas()
+    window.addEventListener('resize', resizeCanvas)
+
+    return () => window.removeEventListener('resize', resizeCanvas)
+  }, [])
+
+  // Coordinate helpers
+  const getCanvasCoordinates = (e) => {
+    const canvas = canvasRef.current
+    if (!canvas) return { x: 0, y: 0 }
+
+    const rect = canvas.getBoundingClientRect()
+    const scaleX = canvas.width / rect.width
+    const scaleY = canvas.height / rect.height
+
     return {
       x: (e.clientX - rect.left) * scaleX,
-      y: (e.clientY - rect.top) * scaleY
-    };
-  };
+      y: (e.clientY - rect.top) * scaleY,
+    }
+  }
 
+  const getTouchCoordinates = (e) => {
+    const canvas = canvasRef.current
+    if (!canvas || !e.touches[0]) return { x: 0, y: 0 }
+
+    const rect = canvas.getBoundingClientRect()
+    const scaleX = canvas.width / rect.width
+    const scaleY = canvas.height / rect.height
+    const touch = e.touches[0]
+
+    return {
+      x: (touch.clientX - rect.left) * scaleX,
+      y: (touch.clientY - rect.top) * scaleY,
+    }
+  }
+
+  // Drawing handlers
   const startDrawing = (e) => {
-    setIsDrawing(true);
-    const pos = getMousePos(e);
-    
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    
- 
-    ctx.strokeStyle = tool === 'eraser' ? '#FFFFFF' : brushColor;
-    ctx.lineWidth = brushSize;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    
+    e.preventDefault()
+    setIsDrawing(true)
 
-    ctx.beginPath();
-    ctx.moveTo(pos.x, pos.y);
-  };
+    const coords = getCanvasCoordinates(e)
+    const canvas = canvasRef.current
+    const ctx = canvas.getContext('2d')
+
+    ctx.strokeStyle = tool === 'eraser' ? '#FFFFFF' : brushColor
+    ctx.lineWidth = brushSize
+    ctx.lineCap = 'round'
+    ctx.lineJoin = 'round'
+    ctx.globalCompositeOperation = tool === 'eraser' ? 'destination-out' : 'source-over'
+
+    ctx.beginPath()
+    ctx.moveTo(coords.x, coords.y)
+  }
 
   const draw = (e) => {
-    if (!isDrawing) return;
-    
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    const pos = getMousePos(e);
-    
-    ctx.lineTo(pos.x, pos.y);
-    ctx.stroke();
-  };
+    e.preventDefault()
+    if (!isDrawing) return
 
-  const stopDrawing = () => {
-    if (!isDrawing) return;
-    setIsDrawing(false);
-    
-    const canvas = canvasRef.current;
-    const imageData = canvas.toDataURL();
-    socketRef.current?.emit('canvas-data', {
-      room: roomCode,
-      imageData
-    });
-  };
+    const coords = getCanvasCoordinates(e)
+    const canvas = canvasRef.current
+    const ctx = canvas.getContext('2d')
 
-  
-  const handleTouchStart = (e) => {
-    e.preventDefault();
-    const touch = e.touches[0];
-    const mouseEvent = new MouseEvent('mousedown', {
-      clientX: touch.clientX,
-      clientY: touch.clientY
-    });
-    startDrawing(mouseEvent);
-  };
+    ctx.lineTo(coords.x, coords.y)
+    ctx.stroke()
+  }
 
-  const handleTouchMove = (e) => {
-    e.preventDefault();
-    const touch = e.touches[0];
-    const mouseEvent = new MouseEvent('mousemove', {
-      clientX: touch.clientX,
-      clientY: touch.clientY
-    });
-    draw(mouseEvent);
-  };
+  const stopDrawing = (e) => {
+    e.preventDefault()
+    if (!isDrawing) return
 
-  const handleTouchEnd = (e) => {
-    e.preventDefault();
-    stopDrawing();
-  };
+    setIsDrawing(false)
 
+    const canvas = canvasRef.current
+    if (canvas && socketRef.current) {
+      const imageData = canvas.toDataURL()
+      socketRef.current.emit('canvas-data', { roomCode, imageData })
+    }
+  }
+
+  // Touch equivalents
+  const startDrawingTouch = (e) => {
+    e.preventDefault()
+    setIsDrawing(true)
+
+    const coords = getTouchCoordinates(e)
+    const canvas = canvasRef.current
+    const ctx = canvas.getContext('2d')
+
+    ctx.strokeStyle = tool === 'eraser' ? '#FFFFFF' : brushColor
+    ctx.lineWidth = brushSize
+    ctx.lineCap = 'round'
+    ctx.lineJoin = 'round'
+    ctx.globalCompositeOperation = tool === 'eraser' ? 'destination-out' : 'source-over'
+
+    ctx.beginPath()
+    ctx.moveTo(coords.x, coords.y)
+  }
+
+  const drawTouch = (e) => {
+    e.preventDefault()
+    if (!isDrawing) return
+
+    const coords = getTouchCoordinates(e)
+    const canvas = canvasRef.current
+    const ctx = canvas.getContext('2d')
+
+    ctx.lineTo(coords.x, coords.y)
+    ctx.stroke()
+  }
+
+  const stopDrawingTouch = (e) => {
+    e.preventDefault()
+    if (!isDrawing) return
+
+    setIsDrawing(false)
+
+    const canvas = canvasRef.current
+    if (canvas && socketRef.current) {
+      const imageData = canvas.toDataURL()
+      socketRef.current.emit('canvas-data', { roomCode, imageData })
+    }
+  }
+
+  // Clear canvas
   const clearCanvas = () => {
     if (window.confirm('Are you sure you want to clear the canvas?')) {
-      const canvas = canvasRef.current;
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = 'white';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      
- 
-      socketRef.current?.emit('clear-canvas', roomCode);
+      const canvas = canvasRef.current
+      const ctx = canvas.getContext('2d')
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      ctx.fillStyle = 'white'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+      socketRef.current?.emit('clear-canvas', roomCode)
     }
-  };
+  }
+
+  // Event listeners on canvas
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    // Bind handlers
+    canvas.addEventListener('mousedown', startDrawing, { passive: false })
+    canvas.addEventListener('mousemove', draw, { passive: false })
+    canvas.addEventListener('mouseup', stopDrawing, { passive: false })
+    canvas.addEventListener('mouseleave', stopDrawing, { passive: false })
+
+    canvas.addEventListener('touchstart', startDrawingTouch, { passive: false })
+    canvas.addEventListener('touchmove', drawTouch, { passive: false })
+    canvas.addEventListener('touchend', stopDrawingTouch, { passive: false })
+
+    return () => {
+      canvas.removeEventListener('mousedown', startDrawing)
+      canvas.removeEventListener('mousemove', draw)
+      canvas.removeEventListener('mouseup', stopDrawing)
+      canvas.removeEventListener('mouseleave', stopDrawing)
+
+      canvas.removeEventListener('touchstart', startDrawingTouch)
+      canvas.removeEventListener('touchmove', drawTouch)
+      canvas.removeEventListener('touchend', stopDrawingTouch)
+    }
+  }, [isDrawing, brushColor, brushSize, tool])
 
   return (
     <div className="whiteboard-app">
@@ -220,7 +280,7 @@ const Board = ({ user, roomCode, roomName, onLeaveRoom }) => {
             min="1"
             max="50"
             value={brushSize}
-            onChange={(e) => setBrushSize(parseInt(e.target.value))}
+            onChange={(e) => setBrushSize(parseInt(e.target.value, 10))}
           />
           <span>{brushSize}px</span>
         </div>
@@ -236,21 +296,14 @@ const Board = ({ user, roomCode, roomName, onLeaveRoom }) => {
         <canvas
           ref={canvasRef}
           className="whiteboard-canvas"
-          onMouseDown={startDrawing}
-          onMouseMove={draw}
-          onMouseUp={stopDrawing}
-          onMouseLeave={stopDrawing}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-          style={{ 
+          style={{
             cursor: tool === 'eraser' ? 'grab' : 'crosshair',
-            touchAction: 'none' 
+            touchAction: 'none', // For mobile drawing
           }}
         />
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Board;
+export default Whiteboard

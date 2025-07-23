@@ -1,229 +1,220 @@
-import React, { useState } from 'react'
+import React, { useState } from "react";
 
-const LoginPage = ({ onLogin }) => {
-  const [activeTab, setActiveTab] = useState('login')
-  const [formData, setFormData] = useState({ 
-    username: '', 
-    email: '', 
-    password: '' 
-  })
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+const RoomManager = ({ user, onJoinRoom }) => {
+  const [activeTab, setActiveTab] = useState("join");
+  const [roomCode, setRoomCode] = useState("");
+  const [roomName, setRoomName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  // UPDATED: Use your new Render backend URL
-  const API_BASE_URL = 'https://collaborative-whiteboard-480h.onrender.com'
+  // Use the same API base URL as LoginPage
+  const API_BASE_URL = 'https://collaborative-whiteboard-480h.onrender.com';
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
-    if (error) setError('')
-  }
+  const handleJoinRoom = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
 
-  const handleLogin = async (e) => {
-    e.preventDefault()
-    setLoading(true)
-    setError('')
-
-    if (!formData.username || !formData.password) {
-      setError('Please fill in all fields')
-      setLoading(false)
-      return
+    if (!roomCode.trim()) {
+      setError('Please enter a room code');
+      setLoading(false);
+      return;
     }
 
     try {
-      console.log('Attempting login with:', { username: formData.username });
+      const token = localStorage.getItem('authToken');
       
-      const response = await fetch(`${API_BASE_URL}/api/login`, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-          username: formData.username,
-          password: formData.password
-        }),
-      })
-
-      console.log('Login response status:', response.status);
-      const data = await response.json()
-      console.log('Login response data:', data);
-      
-      if (response.ok) {
-        localStorage.setItem('authToken', data.token)
-        localStorage.setItem('user', JSON.stringify(data.user))
-        onLogin(data.user)
-      } else {
-        setError(data.error || `Login failed: ${response.status}`)
+      if (!token) {
+        setError('Authentication required. Please log in again.');
+        setLoading(false);
+        return;
       }
-    } catch (err) {
-      console.error('Login error:', err)
-      setError(`Network error: ${err.message}`)
-    }
-    setLoading(false)
-  }
 
-  const handleRegister = async (e) => {
-    e.preventDefault()
-    setLoading(true)
-    setError('')
-
-    if (!formData.username || !formData.email || !formData.password) {
-      setError('Please fill in all fields')
-      setLoading(false)
-      return
-    }
-
-    if (formData.username.length < 3) {
-      setError('Username must be at least 3 characters')
-      setLoading(false)
-      return
-    }
-
-    if (!formData.email.match(/^[a-zA-Z0-9._%+-]+@gmail\.com$/)) {
-      setError('Email must be in Gmail format: xyz@gmail.com')
-      setLoading(false)
-      return
-    }
-
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters')
-      setLoading(false)
-      return
-    }
-
-    try {
-      console.log('Attempting registration with:', { 
-        username: formData.username, 
-        email: formData.email 
+      const response = await fetch(`${API_BASE_URL}/api/verify-room`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ roomCode: roomCode.trim() }),
       });
+
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('user');
+          setError('Session expired. Please log in again.');
+          setTimeout(() => window.location.reload(), 2000);
+          setLoading(false);
+          return;
+        }
+        
+        const errorText = await response.text();
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+        } catch {
+          throw new Error(`Server error: ${response.status}`);
+        }
+        throw new Error(errorData.error || 'Failed to join room');
+      }
+
+      const data = await response.json();
+      onJoinRoom({ code: roomCode.trim(), name: data.room.room_name });
       
-      const response = await fetch(`${API_BASE_URL}/api/register`, {
+    } catch (err) {
+      console.error('Join room error:', err);
+      setError(err.message);
+    }
+    setLoading(false);
+  };
+
+  const handleCreateRoom = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    if (!roomName.trim()) {
+      setError('Please enter a room name');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('authToken');
+      
+      if (!token) {
+        setError('Authentication required. Please log in again.');
+        setLoading(false);
+        return;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/api/create-room`, {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          username: formData.username,
-          email: formData.email,
-          password: formData.password
+          roomName: roomName.trim()
         }),
-      })
+      });
 
-      console.log('Register response status:', response.status);
-      const data = await response.json()
-      console.log('Register response data:', data);
-      
-      if (response.ok) {
-        setActiveTab('login')
-        setFormData({ username: '', email: '', password: '' })
-        setError('')
-        alert('Registration successful! Please login with your credentials.')
-      } else {
-        setError(data.error || `Registration failed: ${response.status}`)
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('user');
+          setError('Session expired. Please log in again.');
+          setTimeout(() => window.location.reload(), 2000);
+          setLoading(false);
+          return;
+        }
+        
+        const errorText = await response.text();
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+        } catch {
+          throw new Error(`Server error: ${response.status}`);
+        }
+        throw new Error(errorData.error || 'Failed to create room');
       }
+
+      const data = await response.json();
+      onJoinRoom({ code: data.roomCode, name: roomName.trim() });
+      
     } catch (err) {
-      console.error('Registration error:', err)
-      setError(`Network error: ${err.message}`)
+      console.error('Create room error:', err);
+      setError(err.message);
     }
-    setLoading(false)
-  }
+    setLoading(false);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
+    window.location.reload();
+  };
 
   return (
-    <div className="login-container">
-      <h1>🎨 Collaborative Whiteboard</h1>
-      <div className="form-container">
-        <div className="tab-buttons">
-          <button
-            className={activeTab === 'login' ? 'tab-btn active' : 'tab-btn'}
-            onClick={() => {
-              setActiveTab('login')
-              setError('')
-              setFormData({ username: '', email: '', password: '' })
-            }}
-          >
-            Login
-          </button>
-          <button
-            className={activeTab === 'register' ? 'tab-btn active' : 'tab-btn'}
-            onClick={() => {
-              setActiveTab('register')
-              setError('')
-              setFormData({ username: '', email: '', password: '' })
-            }}
-          >
-            Register
-          </button>
-        </div>
-
-        {error && <div className="error-message">{error}</div>}
-
-        {activeTab === 'login' ? (
-          <form onSubmit={handleLogin} className="form">
-            <h2>Welcome Back!</h2>
-            <input
-              type="text"
-              name="username"
-              placeholder="Username or Email"
-              value={formData.username}
-              onChange={handleInputChange}
-              disabled={loading}
-              required
-            />
-            <input
-              type="password"
-              name="password"
-              placeholder="Password"
-              value={formData.password}
-              onChange={handleInputChange}
-              disabled={loading}
-              required
-            />
-            <button type="submit" disabled={loading}>
-              {loading ? 'Logging in...' : 'Login'}
-            </button>
-          </form>
-        ) : (
-          <form onSubmit={handleRegister} className="form">
-            <h2>Create Account</h2>
-            <input
-              type="text"
-              name="username"
-              placeholder="Username (min 3 characters)"
-              value={formData.username}
-              onChange={handleInputChange}
-              disabled={loading}
-              required
-            />
-            <div className="email-input-wrapper">
-              <input
-                type="email"
-                name="email"
-                placeholder="Email (xyz@gmail.com)"
-                value={formData.email}
-                onChange={handleInputChange}
-                disabled={loading}
-                required
-              />
-            </div>
-            <input
-              type="password"
-              name="password"
-              placeholder="Password (min 6 characters)"
-              value={formData.password}
-              onChange={handleInputChange}
-              disabled={loading}
-              required
-            />
-            <button type="submit" disabled={loading}>
-              {loading ? 'Creating Account...' : 'Register'}
-            </button>
-          </form>
-        )}
+    <div className="room-manager">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <h2>Welcome, {user.username}!</h2>
+        <button 
+          onClick={handleLogout}
+          style={{
+            background: 'linear-gradient(135deg, #ff6b6b, #ff8e8e)',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            padding: '8px 16px',
+            cursor: 'pointer',
+            fontSize: '14px'
+          }}
+        >
+          Logout
+        </button>
       </div>
-    </div>
-  )
-}
 
-export default LoginPage
+      <div className="tab-buttons">
+        <button
+          className={activeTab === "join" ? "tab-btn active" : "tab-btn"}
+          onClick={() => {
+            setActiveTab("join");
+            setError('');
+            setRoomCode('');
+          }}
+        >
+          Join Room
+        </button>
+        <button
+          className={activeTab === "create" ? "tab-btn active" : "tab-btn"}
+          onClick={() => {
+            setActiveTab("create");
+            setError('');
+            setRoomName('');
+          }}
+        >
+          Create Room
+        </button>
+      </div>
+
+      {error && <div className="error-message">{error}</div>}
+      
+      {activeTab === "join" ? (
+        <form onSubmit={handleJoinRoom} className="form">
+          <h3>Join Existing Room</h3>
+          <input
+            type="text"
+            placeholder="Enter Room Code (e.g., ABC123)"
+            value={roomCode}
+            onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
+            maxLength={6}
+            disabled={loading}
+            required
+          />
+          <button type="submit" disabled={loading || !roomCode.trim()}>
+            {loading ? "Joining..." : "Join Room"}
+          </button>
+        </form>
+      ) : (
+        <form onSubmit={handleCreateRoom} className="form">
+          <h3>Create New Room</h3>
+          <input
+            type="text"
+            placeholder="Enter Room Name (e.g., Team Meeting)"
+            value={roomName}
+            onChange={(e) => setRoomName(e.target.value)}
+            disabled={loading}
+            required
+          />
+          <button type="submit" disabled={loading || !roomName.trim()}>
+            {loading ? "Creating..." : "Create Room"}
+          </button>
+        </form>
+      )}
+    </div>
+  ); 
+};
+
+export default RoomManager;

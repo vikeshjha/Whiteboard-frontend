@@ -9,10 +9,9 @@ const App = () => {
   const [currentRoom, setCurrentRoom] = useState(null)
 
   useEffect(() => {
-    
     const token = localStorage.getItem('authToken')
     const savedUser = localStorage.getItem('user')
-    
+
     if (token && savedUser) {
       try {
         setUser(JSON.parse(savedUser))
@@ -28,11 +27,10 @@ const App = () => {
     setUser(userData)
   }
 
-  const handleRoomJoin = (userData, roomData) => {
+  const handleRoomJoin = (roomData) => {
     setCurrentRoom(roomData)
   }
 
-  
   const handleLeaveRoom = () => {
     setCurrentRoom(null)
   }
@@ -44,7 +42,6 @@ const App = () => {
     localStorage.removeItem('user')
   }
 
-  
   if (!user) {
     return (
       <div className="App">
@@ -53,7 +50,6 @@ const App = () => {
     )
   }
 
- 
   if (!currentRoom) {
     return (
       <div className="App">
@@ -62,11 +58,10 @@ const App = () => {
     )
   }
 
-
   return (
     <div className="App">
-      <Whiteboard 
-        user={user} 
+      <Whiteboard
+        user={user}
         roomCode={currentRoom.code}
         roomName={currentRoom.name}
         onLeaveRoom={handleLeaveRoom}
