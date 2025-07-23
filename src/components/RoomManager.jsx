@@ -7,7 +7,6 @@ const RoomManager = ({ user, onJoinRoom }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Use the same API base URL as LoginPage
   const API_BASE_URL = 'https://collaborative-whiteboard-480h.onrender.com';
 
   const handleJoinRoom = async (e) => {
@@ -63,7 +62,6 @@ const RoomManager = ({ user, onJoinRoom }) => {
       onJoinRoom({ code: roomCode.trim(), name: data.room.room_name });
       
     } catch (err) {
-      console.error('Join room error:', err);
       setError(err.message);
     }
     setLoading(false);
@@ -124,7 +122,6 @@ const RoomManager = ({ user, onJoinRoom }) => {
       onJoinRoom({ code: data.roomCode, name: roomName.trim() });
       
     } catch (err) {
-      console.error('Create room error:', err);
       setError(err.message);
     }
     setLoading(false);

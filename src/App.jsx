@@ -16,7 +16,6 @@ const App = () => {
       try {
         setUser(JSON.parse(savedUser))
       } catch (error) {
-        console.error('Error parsing saved user:', error)
         localStorage.removeItem('authToken')
         localStorage.removeItem('user')
       }
@@ -33,13 +32,6 @@ const App = () => {
 
   const handleLeaveRoom = () => {
     setCurrentRoom(null)
-  }
-
-  const handleLogout = () => {
-    setUser(null)
-    setCurrentRoom(null)
-    localStorage.removeItem('authToken')
-    localStorage.removeItem('user')
   }
 
   if (!user) {

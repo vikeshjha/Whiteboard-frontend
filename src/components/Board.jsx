@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react'
 import io from 'socket.io-client'
 
-const Whiteboard = ({ user, roomCode, roomName, onLeaveRoom }) => {
+const Board = ({ user, roomCode, roomName, onLeaveRoom }) => {
   const canvasRef = useRef(null)
   const socketRef = useRef(null)
   const [isDrawing, setIsDrawing] = useState(false)
@@ -9,10 +9,8 @@ const Whiteboard = ({ user, roomCode, roomName, onLeaveRoom }) => {
   const [brushSize, setBrushSize] = useState(5)
   const [brushColor, setBrushColor] = useState('#000000')
 
-  // Initialize socket and listeners
   useEffect(() => {
     socketRef.current = io('http://localhost:3000')
-
     socketRef.current.emit('join-room', roomCode)
 
     socketRef.current.on('canvas-data', ({ imageData }) => {
@@ -43,7 +41,6 @@ const Whiteboard = ({ user, roomCode, roomName, onLeaveRoom }) => {
     }
   }, [roomCode])
 
-  // Canvas sizing and initial white fill
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
@@ -74,7 +71,6 @@ const Whiteboard = ({ user, roomCode, roomName, onLeaveRoom }) => {
     return () => window.removeEventListener('resize', resizeCanvas)
   }, [])
 
-  // Coordinate helpers
   const getCanvasCoordinates = (e) => {
     const canvas = canvasRef.current
     if (!canvas) return { x: 0, y: 0 }
@@ -104,7 +100,6 @@ const Whiteboard = ({ user, roomCode, roomName, onLeaveRoom }) => {
     }
   }
 
-  // Drawing handlers
   const startDrawing = (e) => {
     e.preventDefault()
     setIsDrawing(true)
@@ -148,7 +143,6 @@ const Whiteboard = ({ user, roomCode, roomName, onLeaveRoom }) => {
     }
   }
 
-  // Touch equivalents
   const startDrawingTouch = (e) => {
     e.preventDefault()
     setIsDrawing(true)
@@ -192,7 +186,6 @@ const Whiteboard = ({ user, roomCode, roomName, onLeaveRoom }) => {
     }
   }
 
-  // Clear canvas
   const clearCanvas = () => {
     if (window.confirm('Are you sure you want to clear the canvas?')) {
       const canvas = canvasRef.current
@@ -206,12 +199,10 @@ const Whiteboard = ({ user, roomCode, roomName, onLeaveRoom }) => {
     }
   }
 
-  // Event listeners on canvas
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
 
-    // Bind handlers
     canvas.addEventListener('mousedown', startDrawing, { passive: false })
     canvas.addEventListener('mousemove', draw, { passive: false })
     canvas.addEventListener('mouseup', stopDrawing, { passive: false })
@@ -298,7 +289,7 @@ const Whiteboard = ({ user, roomCode, roomName, onLeaveRoom }) => {
           className="whiteboard-canvas"
           style={{
             cursor: tool === 'eraser' ? 'grab' : 'crosshair',
-            touchAction: 'none', // For mobile drawing
+            touchAction: 'none',
           }}
         />
       </div>
@@ -306,4 +297,4 @@ const Whiteboard = ({ user, roomCode, roomName, onLeaveRoom }) => {
   )
 }
 
-export default Whiteboard
+export default Board

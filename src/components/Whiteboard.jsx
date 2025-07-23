@@ -8,11 +8,10 @@ const Whiteboard = ({ user, roomCode, roomName, onLeaveRoom }) => {
   const [tool, setTool] = useState('pen')
   const [brushSize, setBrushSize] = useState(5)
   const [brushColor, setBrushColor] = useState('#000000')
+  const [prevCoords, setPrevCoords] = useState({ x: 0, y: 0 })
 
-  // FIXED: Use HTTP instead of HTTPS for socket connection
   const SOCKET_URL = 'http://localhost:3000'
 
-  // Custom cursor with proper SVG
   const createCustomCursor = () => {
     if (tool === 'pen') {
       const size = Math.max(brushSize + 4, 12);
@@ -41,80 +40,48 @@ const Whiteboard = ({ user, roomCode, roomName, onLeaveRoom }) => {
     return 'crosshair';
   };
 
-  // Socket initialization with debugging
   useEffect(() => {
-    console.log('🔌 Initializing socket connection to:', SOCKET_URL);
     socketRef.current = io(SOCKET_URL, {
       transports: ['websocket', 'polling'],
       upgrade: true,
       rememberUpgrade: true
     })
     
-    // Connection status debugging
     socketRef.current.on('connect', () => {
-      console.log('✅ Socket connected:', socketRef.current.id);
-      // Join room after connection is established
       socketRef.current.emit('join-room', roomCode);
-      console.log('🏠 Joining room after connection:', roomCode);
     });
 
-    socketRef.current.on('disconnect', () => {
-      console.log('❌ Socket disconnected');
-    });
-
-    socketRef.current.on('connect_error', (error) => {
-      console.error('❌ Socket connection error:', error);
-    });
-
-    // FIXED: Listen for drawing data from other users
     socketRef.current.on('drawing-data', (data) => {
-      console.log('📥 Received drawing data:', data);
-      
       const canvas = canvasRef.current
       if (!canvas) return
       
       const ctx = canvas.getContext('2d')
-      
-      // Set drawing properties
       ctx.strokeStyle = data.color
       ctx.lineWidth = data.size
       ctx.lineCap = 'round'
       ctx.lineJoin = 'round'
       ctx.globalCompositeOperation = data.tool === 'eraser' ? 'destination-out' : 'source-over'
       
-      // Draw the line
       ctx.beginPath()
       ctx.moveTo(data.prevX, data.prevY)
       ctx.lineTo(data.currentX, data.currentY)
       ctx.stroke()
     });
 
-    // Listen for canvas data from other users (for full canvas sync)
     socketRef.current.on('canvas-data', ({ imageData }) => {
-      console.log('📥 Received full canvas data, length:', imageData?.length);
-      
       const canvas = canvasRef.current
-      if (!canvas) {
-        console.log('❌ Canvas not available');
-        return;
-      }
+      if (!canvas) return;
       
       const ctx = canvas.getContext('2d')
       const img = new Image()
       img.onload = () => {
-        console.log('✅ Drawing received image to canvas');
         ctx.clearRect(0, 0, canvas.width, canvas.height)
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-      }
-      img.onerror = (error) => {
-        console.error('❌ Error loading received image:', error);
       }
       img.src = imageData
     });
 
-    // Listen for clear canvas
     socketRef.current.on('clear-canvas', () => {
-      console.log('📥 Received clear canvas command');
       const canvas = canvasRef.current
       if (!canvas) return
       
@@ -131,12 +98,10 @@ const Whiteboard = ({ user, roomCode, roomName, onLeaveRoom }) => {
     }
   }, [roomCode])
 
-  // Canvas initialization
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
 
-    // Set canvas dimensions
     canvas.width = 650
     canvas.height = 450
     canvas.style.width = '650px'
@@ -149,7 +114,6 @@ const Whiteboard = ({ user, roomCode, roomName, onLeaveRoom }) => {
     ctx.fillRect(0, 0, canvas.width, canvas.height)
   }, [])
 
-  // Update cursor when tool or size changes
   useEffect(() => {
     const canvas = canvasRef.current
     if (canvas) {
@@ -157,10 +121,6 @@ const Whiteboard = ({ user, roomCode, roomName, onLeaveRoom }) => {
     }
   }, [tool, brushSize, brushColor])
 
-  // Store previous coordinates for smooth drawing
-  const [prevCoords, setPrevCoords] = useState({ x: 0, y: 0 })
-
-  // Coordinate calculation
   const getCanvasCoordinates = (e) => {
     const canvas = canvasRef.current
     if (!canvas) return { x: 0, y: 0 }
@@ -190,7 +150,6 @@ const Whiteboard = ({ user, roomCode, roomName, onLeaveRoom }) => {
     }
   }
 
-  // FIXED: Drawing handlers with real-time emission
   const startDrawing = (e) => {
     e.preventDefault()
     setIsDrawing(true)
@@ -219,11 +178,9 @@ const Whiteboard = ({ user, roomCode, roomName, onLeaveRoom }) => {
     const canvas = canvasRef.current
     const ctx = canvas.getContext('2d')
     
-    // Draw locally
     ctx.lineTo(coords.x, coords.y)
     ctx.stroke()
 
-    // FIXED: Emit drawing data in real-time
     if (socketRef.current && socketRef.current.connected) {
       socketRef.current.emit('drawing-data', {
         roomCode,
@@ -246,21 +203,13 @@ const Whiteboard = ({ user, roomCode, roomName, onLeaveRoom }) => {
     
     setIsDrawing(false)
     
-    // Send full canvas data after drawing is complete
     const canvas = canvasRef.current
     if (canvas && socketRef.current && socketRef.current.connected) {
       const imageData = canvas.toDataURL()
-      
-      console.log('📤 Emitting full canvas data for room:', roomCode);
-      
-      socketRef.current.emit('canvas-data', {
-        roomCode,
-        imageData
-      });
+      socketRef.current.emit('canvas-data', { roomCode, imageData });
     }
   }
 
-  // Touch event handlers
   const handleTouchStart = (e) => {
     e.preventDefault()
     setIsDrawing(true)
@@ -289,11 +238,9 @@ const Whiteboard = ({ user, roomCode, roomName, onLeaveRoom }) => {
     const canvas = canvasRef.current
     const ctx = canvas.getContext('2d')
     
-    // Draw locally
     ctx.lineTo(coords.x, coords.y)
     ctx.stroke()
 
-    // Emit drawing data in real-time
     if (socketRef.current && socketRef.current.connected) {
       socketRef.current.emit('drawing-data', {
         roomCode,
@@ -316,15 +263,10 @@ const Whiteboard = ({ user, roomCode, roomName, onLeaveRoom }) => {
     
     setIsDrawing(false)
     
-    // Send full canvas data
     const canvas = canvasRef.current
     if (canvas && socketRef.current && socketRef.current.connected) {
       const imageData = canvas.toDataURL()
-      
-      socketRef.current.emit('canvas-data', {
-        roomCode,
-        imageData
-      });
+      socketRef.current.emit('canvas-data', { roomCode, imageData });
     }
   }
 
@@ -336,7 +278,6 @@ const Whiteboard = ({ user, roomCode, roomName, onLeaveRoom }) => {
       ctx.fillStyle = 'white'
       ctx.fillRect(0, 0, canvas.width, canvas.height)
       
-      console.log('🗑️ Emitting clear canvas for room:', roomCode);
       if (socketRef.current && socketRef.current.connected) {
         socketRef.current.emit('clear-canvas', roomCode)
       }
@@ -369,16 +310,10 @@ const Whiteboard = ({ user, roomCode, roomName, onLeaveRoom }) => {
           <p>User: <strong>{user.username}</strong></p>
         </div>
         <div className="header-buttons">
-          <button 
-            className="back-btn"
-            onClick={handleLeaveRoom}
-          >
+          <button className="back-btn" onClick={handleLeaveRoom}>
             ← Back to Rooms
           </button>
-          <button 
-            className="logout-btn" 
-            onClick={handleLogout}
-          >
+          <button className="logout-btn" onClick={handleLogout}>
             Logout
           </button>
         </div>

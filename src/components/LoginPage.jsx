@@ -30,8 +30,6 @@ const LoginPage = ({ onLogin }) => {
     }
 
     try {
-      console.log('Attempting login with:', { username: formData.username })
-      
       const response = await fetch(`${API_BASE_URL}/api/login`, {
         method: 'POST',
         headers: { 
@@ -44,8 +42,6 @@ const LoginPage = ({ onLogin }) => {
         }),
       })
 
-      console.log('Login response status:', response.status)
-      
       if (!response.ok) {
         const errorText = await response.text()
         let errorData
@@ -58,14 +54,11 @@ const LoginPage = ({ onLogin }) => {
       }
 
       const data = await response.json()
-      console.log('Login response data:', data)
-      
       localStorage.setItem('authToken', data.token)
       localStorage.setItem('user', JSON.stringify(data.user))
       onLogin(data.user)
       
     } catch (err) {
-      console.error('Login error:', err)
       setError(err.message)
     }
     setLoading(false)
@@ -101,11 +94,6 @@ const LoginPage = ({ onLogin }) => {
     }
 
     try {
-      console.log('Attempting registration with:', { 
-        username: formData.username.trim(), 
-        email: formData.email.trim() 
-      })
-      
       const response = await fetch(`${API_BASE_URL}/api/register`, {
         method: 'POST',
         headers: { 
@@ -119,8 +107,6 @@ const LoginPage = ({ onLogin }) => {
         }),
       })
 
-      console.log('Register response status:', response.status)
-      
       if (!response.ok) {
         const errorText = await response.text()
         let errorData
@@ -132,16 +118,12 @@ const LoginPage = ({ onLogin }) => {
         throw new Error(errorData.error || `Registration failed: ${response.status}`)
       }
 
-      const data = await response.json()
-      console.log('Register response data:', data)
-      
       setActiveTab('login')
       setFormData({ username: '', email: '', password: '' })
       setError('')
       alert('Registration successful! Please login with your credentials.')
       
     } catch (err) {
-      console.error('Registration error:', err)
       setError(err.message)
     }
     setLoading(false)

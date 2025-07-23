@@ -716,7 +716,7 @@ html, body {
 
 
 .email-input-wrapper::before {
-  content: "📧";
+  content: "";
   position: absolute;
   left: 16px;
   font-size: 16px;
@@ -1096,13 +1096,11 @@ textarea:focus {
   -webkit-text-fill-color: #2d3748 !important;
 }
 
-/* Original shimmer animation used by login container */
 @keyframes shimmer {
   0% { transform: rotate(45deg) translateX(-200%); }
   100% { transform: rotate(45deg) translateX(200%); }
 }
 
-/* Tool button hover shimmer animation */
 .tool-btn::before {
   content: '';
   position: absolute;
