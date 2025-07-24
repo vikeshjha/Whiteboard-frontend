@@ -10,7 +10,7 @@ const Board = ({ user, roomCode, roomName, onLeaveRoom }) => {
   const [brushColor, setBrushColor] = useState('#000000')
 
   useEffect(() => {
-    socketRef.current = io('https://test-backend-ozii.onrender.com')
+    socketRef.current = io('https://collaborative-whiteboard-backend-evz4.onrender.com')
     socketRef.current.emit('join-room', roomCode)
 
     socketRef.current.on('canvas-data', ({ imageData }) => {

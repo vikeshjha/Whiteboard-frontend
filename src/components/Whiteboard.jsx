@@ -10,7 +10,7 @@ const Whiteboard = ({ user, roomCode, roomName, onLeaveRoom }) => {
   const [brushColor, setBrushColor] = useState('#000000')
   const [prevCoords, setPrevCoords] = useState({ x: 0, y: 0 })
 
-  const SOCKET_URL = 'https://test-backend-ozii.onrender.com'
+  const SOCKET_URL = 'https://collaborative-whiteboard-backend-evz4.onrender.com'
 
   const createCustomCursor = () => {
     if (tool === 'pen') {
