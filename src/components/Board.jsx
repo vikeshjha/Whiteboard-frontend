@@ -10,7 +10,7 @@ const Board = ({ user, roomCode, roomName, onLeaveRoom }) => {
   const [brushColor, setBrushColor] = useState('#000000')
 
   useEffect(() => {
-    socketRef.current = io('http://localhost:3000')
+    socketRef.current = io('https://whiteboard-backend-two.vercel.app/')
     socketRef.current.emit('join-room', roomCode)
 
     socketRef.current.on('canvas-data', ({ imageData }) => {

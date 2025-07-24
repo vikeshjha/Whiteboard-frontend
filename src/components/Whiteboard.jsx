@@ -10,7 +10,7 @@ const Whiteboard = ({ user, roomCode, roomName, onLeaveRoom }) => {
   const [brushColor, setBrushColor] = useState('#000000')
   const [prevCoords, setPrevCoords] = useState({ x: 0, y: 0 })
 
-  const SOCKET_URL = 'http://localhost:3000'
+  const SOCKET_URL = 'https://whiteboard-backend-two.vercel.app/'
 
   const createCustomCursor = () => {
     if (tool === 'pen') {
