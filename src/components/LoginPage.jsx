@@ -10,7 +10,7 @@ const LoginPage = ({ onLogin }) => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const API_BASE_URL = 'https://whiteboard-backend-two.vercel.app/'
+  const API_BASE_URL = 'https://test-backend-ozii.onrender.com'
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
